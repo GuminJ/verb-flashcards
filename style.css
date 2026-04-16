@@ -171,4 +171,58 @@ h1 {
     max-width: 320px;
     height: 220px;
   }
+
+  .present-card {
+  position: relative;
+}
+
+.star-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #f4f6fb;
+  color: #999;
+  font-size: 1.6rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.star-btn:hover {
+  transform: scale(1.05);
+}
+
+.star-btn.active {
+  color: #f5b301;
+  background: #fff7d6;
+}
+
+.secondary-btn {
+  background: white;
+  color: #304ffe;
+  border: 1.5px solid #304ffe;
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.secondary-btn:hover {
+  background: #f5f7ff;
+  transform: translateY(-1px);
+}
+
+.end-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+  
 }
