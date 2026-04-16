@@ -111,6 +111,7 @@ function toggleStar(event) {
 
 
 function loadCurrentCard() {
+  resetFlipCardsInstant();
   if (currentIndex >= shuffledData.length) {
     showScreen(endScreen);
     restartStarredBtn.style.display = starredWords.size > 0 ? "inline-block" : "none";
