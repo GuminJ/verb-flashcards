@@ -66,9 +66,18 @@ function showScreen(screen) {
   screen.classList.add("active");
 }
 
-function resetFlipCards() {
+function resetFlipCardsInstant() {
+  pastCard.classList.add("no-transition");
+  ppCard.classList.add("no-transition");
+
   pastCard.classList.remove("flipped");
   ppCard.classList.remove("flipped");
+
+  void pastCard.offsetWidth;
+  void ppCard.offsetWidth;
+
+  pastCard.classList.remove("no-transition");
+  ppCard.classList.remove("no-transition");
 }
 
 function getCurrentVerb() {
@@ -107,6 +116,24 @@ function loadCurrentCard() {
     restartStarredBtn.style.display = starredWords.size > 0 ? "inline-block" : "none";
     return;
   }
+
+  // 먼저 카드 상태를 즉시 원위치
+  resetFlipCardsInstant();
+
+  const currentVerb = getCurrentVerb();
+
+  presentWord.textContent = currentVerb.present;
+  pastWord.textContent = currentVerb.past;
+  ppWord.textContent = currentVerb.pastParticiple;
+
+  presentMeaning.textContent = currentVerb.meaning.present;
+  pastMeaning.textContent = currentVerb.meaning.past;
+  ppMeaning.textContent = currentVerb.meaning.pastParticiple;
+
+  progressText.textContent = `${currentIndex + 1} / ${shuffledData.length}`;
+
+  updateStarButton();
+}
 
   const currentVerb = getCurrentVerb();
 
