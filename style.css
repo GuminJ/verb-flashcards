@@ -221,5 +221,9 @@ h1 {
   flex-wrap: wrap;
   margin-top: 20px;
 }
+
+.no-transition .flip-card-inner {
+transition: none !important;
+}
   
 }
