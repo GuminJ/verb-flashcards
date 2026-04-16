@@ -19,6 +19,7 @@
 
       <div class="cards-wrapper">
         <div class="present-card static-card">
+          <button id="star-btn" class="star-btn" type="button" aria-label="별표 체크">☆</button>
           <div class="card-label">현재</div>
           <div id="present-word" class="card-word">go</div>
           <div id="present-meaning" class="card-meaning">가다</div>
@@ -62,7 +63,10 @@
     <section id="end-screen" class="screen">
       <h1>완료</h1>
       <p class="subtitle">모든 단어를 확인했습니다.</p>
-      <button id="restart-btn" class="primary-btn">다시 시작</button>
+      <div class="end-buttons">
+        <button id="restart-btn" class="primary-btn">다시 시작</button>
+        <button id="restart-starred-btn" class="secondary-btn">별표만 다시하기</button>
+      </div>
     </section>
   </main>
 
