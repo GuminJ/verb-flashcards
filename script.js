@@ -18,9 +18,32 @@ const progressText = document.getElementById("progress-text");
 
 const pastCard = document.getElementById("past-card");
 const ppCard = document.getElementById("pp-card");
+const presentCard = document.querySelector(".present-card");
 
 let shuffledData = [];
 let currentIndex = 0;
+
+function speakWord(text) {
+  if (!("speechSynthesis" in window)) {
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-US";
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+  const englishVoice = voices.find(voice => voice.lang && voice.lang.startsWith("en"));
+
+  if (englishVoice) {
+    utterance.voice = englishVoice;
+  }
+
+  window.speechSynthesis.speak(utterance);
+}
 
 /* ---------------------------
    배열 랜덤 섞기 (중복 방지 핵심)
@@ -102,12 +125,23 @@ function goToNextCard() {
 /* ---------------------------
    카드 클릭 이벤트
 ---------------------------- */
+presentCard.addEventListener("click", () => {
+  const currentVerb = shuffledData[currentIndex];
+  speakWord(currentVerb.present);
+});
+
 pastCard.addEventListener("click", () => {
   pastCard.classList.toggle("flipped");
+
+  const currentVerb = shuffledData[currentIndex];
+  speakWord(currentVerb.past);
 });
 
 ppCard.addEventListener("click", () => {
   ppCard.classList.toggle("flipped");
+
+  const currentVerb = shuffledData[currentIndex];
+  speakWord(currentVerb.pastParticiple);
 });
 
 /* ---------------------------
