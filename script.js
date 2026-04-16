@@ -24,13 +24,10 @@ const starBtn = document.getElementById("star-btn");
 
 let shuffledData = [];
 let currentIndex = 0;
-let currentMode = "all"; // "all" | "starred"
 const starredWords = new Set();
 
 function speakWord(text) {
-  if (!("speechSynthesis" in window)) {
-    return;
-  }
+  if (!("speechSynthesis" in window)) return;
 
   window.speechSynthesis.cancel();
 
@@ -40,7 +37,9 @@ function speakWord(text) {
   utterance.pitch = 1;
 
   const voices = window.speechSynthesis.getVoices();
-  const englishVoice = voices.find(voice => voice.lang && voice.lang.startsWith("en"));
+  const englishVoice = voices.find(
+    (voice) => voice.lang && voice.lang.startsWith("en")
+  );
 
   if (englishVoice) {
     utterance.voice = englishVoice;
@@ -62,8 +61,11 @@ function showScreen(screen) {
   homeScreen.classList.remove("active");
   quizScreen.classList.remove("active");
   endScreen.classList.remove("active");
-
   screen.classList.add("active");
+}
+
+function getCurrentVerb() {
+  return shuffledData[currentIndex];
 }
 
 function resetFlipCardsInstant() {
@@ -80,49 +82,29 @@ function resetFlipCardsInstant() {
   ppCard.classList.remove("no-transition");
 }
 
-function getCurrentVerb() {
-  return shuffledData[currentIndex];
-}
-
 function updateStarButton() {
   const currentVerb = getCurrentVerb();
-  if (!currentVerb) return;
+  if (!currentVerb || !starBtn) return;
 
   const isStarred = starredWords.has(currentVerb.present);
-
-  // 핵심: 문자 자체를 변경
   starBtn.textContent = isStarred ? "★" : "☆";
 }
 
-function toggleStar(event) {
-  event.stopPropagation();
+function loadCurrentCard() {
+  if (currentIndex >= shuffledData.length) {
+    showScreen(endScreen);
+    if (restartStarredBtn) {
+      restartStarredBtn.style.display =
+        starredWords.size > 0 ? "inline-block" : "none";
+    }
+    return;
+  }
+
+  resetFlipCardsInstant();
 
   const currentVerb = getCurrentVerb();
   if (!currentVerb) return;
 
-  if (starredWords.has(currentVerb.present)) {
-    starredWords.delete(currentVerb.present);
-  } else {
-    starredWords.add(currentVerb.present);
-  }
-
-  updateStarButton();
-}
-
-
-function loadCurrentCard() {
-  resetFlipCardsInstant();
-  if (currentIndex >= shuffledData.length) {
-    showScreen(endScreen);
-    restartStarredBtn.style.display = starredWords.size > 0 ? "inline-block" : "none";
-    return;
-  }
-
-  // 먼저 카드 상태를 즉시 원위치
-  resetFlipCardsInstant();
-
-  const currentVerb = getCurrentVerb();
-
   presentWord.textContent = currentVerb.present;
   pastWord.textContent = currentVerb.past;
   ppWord.textContent = currentVerb.pastParticiple;
@@ -133,30 +115,14 @@ function loadCurrentCard() {
 
   progressText.textContent = `${currentIndex + 1} / ${shuffledData.length}`;
 
-  updateStarButton();
-}
-
-  const currentVerb = getCurrentVerb();
-
-  presentWord.textContent = currentVerb.present;
-  pastWord.textContent = currentVerb.past;
-  ppWord.textContent = currentVerb.pastParticiple;
-
-  presentMeaning.textContent = currentVerb.meaning.present;
-  pastMeaning.textContent = currentVerb.meaning.past;
-  ppMeaning.textContent = currentVerb.meaning.pastParticiple;
-
-  progressText.textContent = `${currentIndex + 1} / ${shuffledData.length}`;
-
-  resetFlipCards();
   updateStarButton();
 }
 
 function startQuiz(mode = "all") {
-  currentMode = mode;
-
   if (mode === "starred") {
-    const starredVerbList = verbData.filter(verb => starredWords.has(verb.present));
+    const starredVerbList = verbData.filter((verb) =>
+      starredWords.has(verb.present)
+    );
     shuffledData = shuffleArray(starredVerbList);
   } else {
     shuffledData = shuffleArray(verbData);
@@ -166,7 +132,9 @@ function startQuiz(mode = "all") {
 
   if (shuffledData.length === 0) {
     showScreen(endScreen);
-    restartStarredBtn.style.display = "none";
+    if (restartStarredBtn) {
+      restartStarredBtn.style.display = "none";
+    }
     return;
   }
 
@@ -175,7 +143,7 @@ function startQuiz(mode = "all") {
 }
 
 function goToNextCard() {
-  currentIndex++;
+  currentIndex += 1;
   loadCurrentCard();
 }
 
@@ -194,31 +162,48 @@ function toggleStar(event) {
   updateStarButton();
 }
 
-presentCard.addEventListener("click", () => {
-  const currentVerb = getCurrentVerb();
-  if (!currentVerb) return;
-  speakWord(currentVerb.present);
-});
+if (presentCard) {
+  presentCard.addEventListener("click", () => {
+    const currentVerb = getCurrentVerb();
+    if (!currentVerb) return;
+    speakWord(currentVerb.present);
+  });
+}
 
-pastCard.addEventListener("click", () => {
-  pastCard.classList.toggle("flipped");
+if (pastCard) {
+  pastCard.addEventListener("click", () => {
+    pastCard.classList.toggle("flipped");
+    const currentVerb = getCurrentVerb();
+    if (!currentVerb) return;
+    speakWord(currentVerb.past);
+  });
+}
 
-  const currentVerb = getCurrentVerb();
-  if (!currentVerb) return;
-  speakWord(currentVerb.past);
-});
+if (ppCard) {
+  ppCard.addEventListener("click", () => {
+    ppCard.classList.toggle("flipped");
+    const currentVerb = getCurrentVerb();
+    if (!currentVerb) return;
+    speakWord(currentVerb.pastParticiple);
+  });
+}
 
-ppCard.addEventListener("click", () => {
-  ppCard.classList.toggle("flipped");
+if (starBtn) {
+  starBtn.addEventListener("click", toggleStar);
+}
 
-  const currentVerb = getCurrentVerb();
-  if (!currentVerb) return;
-  speakWord(currentVerb.pastParticiple);
-});
+if (startBtn) {
+  startBtn.addEventListener("click", () => startQuiz("all"));
+}
 
-starBtn.addEventListener("click", toggleStar);
+if (nextBtn) {
+  nextBtn.addEventListener("click", goToNextCard);
+}
 
-startBtn.addEventListener("click", () => startQuiz("all"));
-nextBtn.addEventListener("click", goToNextCard);
-restartBtn.addEventListener("click", () => startQuiz("all"));
-restartStarredBtn.addEventListener("click", () => startQuiz("starred"));
+if (restartBtn) {
+  restartBtn.addEventListener("click", () => startQuiz("all"));
+}
+
+if (restartStarredBtn) {
+  restartStarredBtn.addEventListener("click", () => startQuiz("starred"));
+}
