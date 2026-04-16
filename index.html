@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>과거/과거분사 정복하기</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <section id="home-screen" class="screen active">
+      <h1>과거/과거분사 정복하기</h1>
+      <p class="subtitle">현재형을 보고 과거형과 과거분사를 익혀보세요.</p>
+      <button id="start-btn" class="primary-btn">시작</button>
+    </section>
+
+    <section id="quiz-screen" class="screen">
+      <h1>과거/과거분사 정복하기</h1>
+
+      <div class="cards-wrapper">
+        <div class="present-card static-card">
+          <div class="card-label">현재</div>
+          <div id="present-word" class="card-word">go</div>
+        </div>
+
+        <div class="flip-card" id="past-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="card-label">정답 확인</div>
+              <div class="card-word">과거?</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="card-label">과거</div>
+              <div id="past-word" class="card-word">went</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flip-card" id="pp-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">
+              <div class="card-label">정답 확인</div>
+              <div class="card-word">과거분사?</div>
+            </div>
+            <div class="flip-card-back">
+              <div class="card-label">과거분사</div>
+              <div id="pp-word" class="card-word">gone</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-controls">
+        <p id="progress-text">1 / 1</p>
+        <button id="next-btn" class="primary-btn">다음</button>
+      </div>
+    </section>
+
+    <section id="end-screen" class="screen">
+      <h1>완료</h1>
+      <p class="subtitle">모든 단어를 확인했습니다.</p>
+      <button id="restart-btn" class="primary-btn">다시 시작</button>
+    </section>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
