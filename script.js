@@ -5,6 +5,7 @@ const endScreen = document.getElementById("end-screen");
 const startBtn = document.getElementById("start-btn");
 const nextBtn = document.getElementById("next-btn");
 const restartBtn = document.getElementById("restart-btn");
+const restartStarredBtn = document.getElementById("restart-starred-btn");
 
 const presentWord = document.getElementById("present-word");
 const pastWord = document.getElementById("past-word");
@@ -16,12 +17,15 @@ const ppMeaning = document.getElementById("pp-meaning");
 
 const progressText = document.getElementById("progress-text");
 
+const presentCard = document.querySelector(".present-card");
 const pastCard = document.getElementById("past-card");
 const ppCard = document.getElementById("pp-card");
-const presentCard = document.querySelector(".present-card");
+const starBtn = document.getElementById("star-btn");
 
 let shuffledData = [];
 let currentIndex = 0;
+let currentMode = "all"; // "all" | "starred"
+const starredWords = new Set();
 
 function speakWord(text) {
   if (!("speechSynthesis" in window)) {
@@ -45,9 +49,6 @@ function speakWord(text) {
   window.speechSynthesis.speak(utterance);
 }
 
-/* ---------------------------
-   배열 랜덤 섞기 (중복 방지 핵심)
----------------------------- */
 function shuffleArray(array) {
   const copied = [...array];
   for (let i = copied.length - 1; i > 0; i--) {
@@ -57,9 +58,6 @@ function shuffleArray(array) {
   return copied;
 }
 
-/* ---------------------------
-   화면 전환
----------------------------- */
 function showScreen(screen) {
   homeScreen.classList.remove("active");
   quizScreen.classList.remove("active");
@@ -68,85 +66,115 @@ function showScreen(screen) {
   screen.classList.add("active");
 }
 
-/* ---------------------------
-   카드 뒤집기 초기화
----------------------------- */
 function resetFlipCards() {
   pastCard.classList.remove("flipped");
   ppCard.classList.remove("flipped");
 }
 
-/* ---------------------------
-   현재 문제 로드
----------------------------- */
+function getCurrentVerb() {
+  return shuffledData[currentIndex];
+}
+
+function updateStarButton() {
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
+
+  const isStarred = starredWords.has(currentVerb.present);
+
+  starBtn.textContent = isStarred ? "★" : "☆";
+  starBtn.classList.toggle("active", isStarred);
+}
+
 function loadCurrentCard() {
   if (currentIndex >= shuffledData.length) {
     showScreen(endScreen);
+    restartStarredBtn.style.display = starredWords.size > 0 ? "inline-block" : "none";
     return;
   }
 
-  const currentVerb = shuffledData[currentIndex];
+  const currentVerb = getCurrentVerb();
 
-  // 영어
   presentWord.textContent = currentVerb.present;
   pastWord.textContent = currentVerb.past;
   ppWord.textContent = currentVerb.pastParticiple;
 
-  // 한글 의미
   presentMeaning.textContent = currentVerb.meaning.present;
   pastMeaning.textContent = currentVerb.meaning.past;
   ppMeaning.textContent = currentVerb.meaning.pastParticiple;
 
-  // 진행도
   progressText.textContent = `${currentIndex + 1} / ${shuffledData.length}`;
 
-  // 카드 초기화
   resetFlipCards();
+  updateStarButton();
 }
 
-/* ---------------------------
-   시작
----------------------------- */
-function startQuiz() {
-  shuffledData = shuffleArray(verbData);
+function startQuiz(mode = "all") {
+  currentMode = mode;
+
+  if (mode === "starred") {
+    const starredVerbList = verbData.filter(verb => starredWords.has(verb.present));
+    shuffledData = shuffleArray(starredVerbList);
+  } else {
+    shuffledData = shuffleArray(verbData);
+  }
+
   currentIndex = 0;
+
+  if (shuffledData.length === 0) {
+    showScreen(endScreen);
+    restartStarredBtn.style.display = "none";
+    return;
+  }
+
   showScreen(quizScreen);
   loadCurrentCard();
 }
 
-/* ---------------------------
-   다음 문제
----------------------------- */
 function goToNextCard() {
   currentIndex++;
   loadCurrentCard();
 }
 
-/* ---------------------------
-   카드 클릭 이벤트
----------------------------- */
+function toggleStar(event) {
+  event.stopPropagation();
+
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
+
+  if (starredWords.has(currentVerb.present)) {
+    starredWords.delete(currentVerb.present);
+  } else {
+    starredWords.add(currentVerb.present);
+  }
+
+  updateStarButton();
+}
+
 presentCard.addEventListener("click", () => {
-  const currentVerb = shuffledData[currentIndex];
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
   speakWord(currentVerb.present);
 });
 
 pastCard.addEventListener("click", () => {
   pastCard.classList.toggle("flipped");
 
-  const currentVerb = shuffledData[currentIndex];
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
   speakWord(currentVerb.past);
 });
 
 ppCard.addEventListener("click", () => {
   ppCard.classList.toggle("flipped");
 
-  const currentVerb = shuffledData[currentIndex];
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
   speakWord(currentVerb.pastParticiple);
 });
 
-/* ---------------------------
-   버튼 이벤트
----------------------------- */
-startBtn.addEventListener("click", startQuiz);
+starBtn.addEventListener("click", toggleStar);
+
+startBtn.addEventListener("click", () => startQuiz("all"));
 nextBtn.addEventListener("click", goToNextCard);
-restartBtn.addEventListener("click", startQuiz);
+restartBtn.addEventListener("click", () => startQuiz("all"));
+restartStarredBtn.addEventListener("click", () => startQuiz("starred"));
