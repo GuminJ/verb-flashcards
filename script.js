@@ -81,9 +81,25 @@ function updateStarButton() {
 
   const isStarred = starredWords.has(currentVerb.present);
 
-  starBtn.textContent = "★";
-  starBtn.classList.toggle("active", isStarred);
+  // 핵심: 문자 자체를 변경
+  starBtn.textContent = isStarred ? "★" : "☆";
 }
+
+function toggleStar(event) {
+  event.stopPropagation();
+
+  const currentVerb = getCurrentVerb();
+  if (!currentVerb) return;
+
+  if (starredWords.has(currentVerb.present)) {
+    starredWords.delete(currentVerb.present);
+  } else {
+    starredWords.add(currentVerb.present);
+  }
+
+  updateStarButton();
+}
+
 
 function loadCurrentCard() {
   if (currentIndex >= shuffledData.length) {
