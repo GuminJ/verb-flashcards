@@ -81,7 +81,7 @@ function updateStarButton() {
 
   const isStarred = starredWords.has(currentVerb.present);
 
-  starBtn.textContent = isStarred ? "★" : "☆";
+  starBtn.textContent = "★";
   starBtn.classList.toggle("active", isStarred);
 }
 
